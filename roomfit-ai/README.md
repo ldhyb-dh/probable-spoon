@@ -11,28 +11,29 @@
 - 한국어 문서 언어, 페이지 제목·설명, 키보드 포커스 및 본문 바로가기
 - GitHub 저장
 
-요청에 따라 설치 명령은 실행하지 않았습니다. Next.js 의존성이 없는 환경에서 작성했으므로 개발 서버 실행, 실제 브라우저 표시, ESLint, TypeScript 전체 검사 및 프로덕션 빌드는 아직 검증하지 않았습니다. 패키지 설치를 실행하지 않아 lockfile도 생성하지 않았습니다.
+2026-11-12 후속 요청에 따라 의존성을 설치하고 프로덕션 빌드·서버 실행·HTTP 검증을 완료했습니다. ESLint와 TypeScript 검사도 통과했습니다. `package-lock.json`으로 설치 버전을 고정했습니다. 브라우저 시각 확인과 클릭 테스트는 실행 환경 제한으로 완료하지 못했습니다. 자세한 결과는 [검증 기록](docs/verification.md)을 참고하세요.
 
 ## 기술 구성
 
 Next.js 16.4.6 / React 19 / TypeScript / Tailwind CSS 4 / ESLint 9 / App Router.
 Node.js 최소 버전은 20.9입니다. Next.js와 eslint-config-next 버전을 맞췄으며, Tailwind와 PostCSS 플러그인은 4.3.3으로 맞췄습니다.
 
-## 실행 (의존성이 준비된 환경)
+## 설치 및 실행
 
 이 저장소의 `roomfit-ai` 폴더에서 실행합니다.
 
 ```sh
+npm ci
 npm run dev
 ```
 
-브라우저에서 http://localhost:3000 으로 접속합니다. 의존성이 아직 없다면 이 명령만으로 실행되지 않습니다.
+브라우저에서 http://localhost:3000 으로 접속합니다. 프로덕션 실행은 `npm run build` 후 `npm start`를 사용합니다.
 
 ```sh
-npm run lint
-npm run typecheck
-npm run build
+npm run verify
 ```
+
+`verify`는 ESLint → 프로덕션 빌드 → TypeScript → 프로덕션 HTTP smoke 검사를 순서대로 실행합니다. `npm run smoke`는 빌드된 앱을 임의의 빈 로컬 포트로 실행하고, 홈·준비 안내·404·CSS 응답을 확인한 후 서버를 종료합니다. 실제 브라우저 동작 검사는 포함하지 않습니다.
 
 환경변수나 API 키는 1일차에 필요하지 않습니다.
 
@@ -52,4 +53,4 @@ npm run build
 
 ## 저장 위치
 
-현재 연결된 `ldhyb-dh/probable-spoon` 저장소의 `roomfit-ai/` 폴더에 저장했습니다. 독립 저장소 생성·프로그램 설치·배포는 수행하지 않았습니다.
+현재 연결된 `ldhyb-dh/probable-spoon` 저장소의 `roomfit-ai/` 폴더에 저장했습니다. 독립 저장소 생성과 외부 배포는 수행하지 않았습니다. 개발 의존성은 이 프로젝트 내부에 설치해 검증했습니다.
