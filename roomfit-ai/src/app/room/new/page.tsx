@@ -2,77 +2,66 @@
 import Link from "next/link";
 import { useId, useRef, useState } from "react";
 import type { FormEvent } from "react";
-import { parseRoom, fitRoom } from "@/lib/room";
-import type { Room, RoomErrors } from "@/lib/room";
+import { fieldsFor, fitRoom, measureRoom, parseRoom, shapes } from "@/lib/room";
+import type { FieldKey, Room, RoomErrors, RoomShape } from "@/lib/room";
 
 export default function NewRoom() {
-  const [width, setWidth] = useState("");
-  const [depth, setDepth] = useState("");
-  const [room, setRoom] = useState<Room | null>(null);
-  const [errors, setErrors] = useState<RoomErrors>({});
-  const widthRef = useRef<HTMLInputElement>(null), depthRef = useRef<HTMLInputElement>(null);
-  const gridId = useId();
-  const plan = room ? fitRoom(room) : null;
-  const changed = room && (Number(width) !== room.width || Number(depth) !== room.depth);
-  function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const result = parseRoom(width, depth);
-    setErrors(result.errors);
-    if (result.room) setRoom(result.room);
-    else if (result.errors.width) widthRef.current?.focus();
-    else depthRef.current?.focus();
+  const [shape,setShape]=useState<RoomShape>("rectangle");
+  const [values,setValues]=useState<Partial<Record<FieldKey,string>>>({});
+  const [room,setRoom]=useState<Room|null>(null);
+  const [errors,setErrors]=useState<RoomErrors>({});
+  const [notice,setNotice]=useState("");
+  const formRef=useRef<HTMLFormElement>(null);
+  const gridId=useId();
+  const fields=fieldsFor(shape);
+  const plan=room?fitRoom(room):null, metrics=room?measureRoom(room):null;
+  const changed=room && fields.some(f=>Number(values[f.key])!==room[f.key]);
+  function submit(e:FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const result=parseRoom(shape,values);setErrors(result.errors);
+    if(result.room){setRoom(result.room);setNotice("평면도가 업데이트됐어요.");}
+    else {setNotice("입력한 길이를 확인해 주세요.");const key=fields.find(f=>result.errors[f.key])?.key;formRef.current?.querySelector<HTMLInputElement>(`#room-${key}`)?.focus();}
   }
-  function sample() {
-    setWidth("360"); setDepth("420"); setRoom({ width: 360, depth: 420 }); setErrors({});
+  function sample(){
+    const v={width:"400",depth:"500",cutWidth:shape==="u"?"160":"180",cutDepth:"200",leftWing:"100"};
+    setValues(v);setErrors({});setRoom(parseRoom(shape,v).room);setNotice("예시 방을 불러왔어요.");
   }
+  function select(next:RoomShape){setShape(next);setRoom(null);setErrors({});setNotice("");}
   return <>
     <a className="skip-link" href="#room-main">본문 바로가기</a>
-    <header className="header container">
-      <Link href="/" className="brand" aria-label="RoomFit AI 홈"><span className="brand-icon" aria-hidden="true">⌑</span>RoomFit <span className="brand-ai">AI</span></Link>
-      <Link href="/" className="nav-link">← 홈으로 돌아가기</Link>
-    </header>
+    <header className="header container"><Link href="/" className="brand" aria-label="RoomFit AI 홈"><span className="brand-icon" aria-hidden="true">⌑</span>RoomFit <span className="brand-ai">AI</span></Link><Link href="/" className="nav-link">← 홈으로 돌아가기</Link></header>
     <main id="room-main" className="container room-builder">
       <p className="eyebrow">STEP 01 · 나의 공간 그리기</p>
-      <h1>내 방의 크기를<br /><span>알려주세요.</span></h1>
-      <p className="builder-description">가로와 세로 길이를 입력하면 실제 비율에 맞는 평면도를 그려드려요.</p>
+      <h1>우리 방 모양대로,<br/><span>벽을 따라 그려요.</span></h1>
+      <p className="builder-description">방 형태를 고르고 벽 안쪽 길이를 입력해 주세요. 들어간 공간까지 반영해 평면도를 만들어요.</p>
+      <aside className="measurement-tip"><strong>둘레만 알면 방을 그릴 수 있나요?</strong><p>둘레의 총길이가 같아도 방의 모양과 면적은 달라질 수 있어요. 방 형태와 필요한 벽 길이를 함께 입력하면 나머지 벽 길이와 둘레를 계산해 드려요.</p></aside>
+      <fieldset className="shape-picker"><legend>1. 방 형태 선택</legend><div className="shape-options">{shapes.map(s=><label key={s.id} className={`shape-option ${shape===s.id?"selected":""}`}><input type="radio" name="shape" value={s.id} checked={shape===s.id} onChange={()=>select(s.id)}/><svg viewBox="0 0 64 56" aria-hidden="true"><path d={s.path}/></svg><span>{s.name}</span></label>)}</div></fieldset>
       <div className="builder-grid">
         <section className="room-form-card" aria-labelledby="dimensions-title">
-          <h2 id="dimensions-title">방 크기 입력</h2>
-          <p className="field-hint" id="dimensions-hint">벽 안쪽을 기준으로 측정해 주세요. 단위는 cm입니다.</p>
-          <form onSubmit={submit} noValidate>
-            <label className="field-label" htmlFor="room-width">가로 길이</label>
-            <div className="dimension-input"><input ref={widthRef} id="room-width" type="number" inputMode="numeric" min="100" max="2000" step="1" required value={width} onChange={e => setWidth(e.target.value)} placeholder="예: 360" aria-invalid={!!errors.width} aria-describedby={`dimensions-hint width-hint${errors.width ? " width-error" : ""}`} /><span>cm</span></div>
-            <p id="width-hint" className="field-hint">위에서 보았을 때 좌우 길이</p>
-            {errors.width && <p id="width-error" className="field-error">{errors.width}</p>}
-            <label className="field-label" htmlFor="room-depth">세로 길이</label>
-            <div className="dimension-input"><input ref={depthRef} id="room-depth" type="number" inputMode="numeric" min="100" max="2000" step="1" required value={depth} onChange={e => setDepth(e.target.value)} placeholder="예: 420" aria-invalid={!!errors.depth} aria-describedby={`depth-hint${errors.depth ? " depth-error" : ""}`} /><span>cm</span></div>
-            <p id="depth-hint" className="field-hint">위에서 보았을 때 앞뒤 길이</p>
-            {errors.depth && <p id="depth-error" className="field-error">{errors.depth}</p>}
-            <p className="input-policy">100~2,000cm 사이의 정수로 입력해 주세요.</p>
-            <button className="button create-plan" type="submit">{room ? "평면도 업데이트" : "평면도 만들기"}<span aria-hidden="true">→</span></button>
-            <button className="sample-button" type="button" onClick={sample}>예시 방으로 시작하기 (360 × 420cm)</button>
-          </form>
+          <h2 id="dimensions-title">방 크기 입력</h2><p className="field-hint">2. 선택한 모양의 벽을 측정해 주세요. 단위는 cm입니다.</p>
+          <form ref={formRef} onSubmit={submit} noValidate>
+            {fields.map(f=><div key={f.key}><label className="field-label" htmlFor={`room-${f.key}`}>{f.label}</label><div className="dimension-input"><input id={`room-${f.key}`} type="number" inputMode="numeric" required min={f.min} max="2000" step="1" value={values[f.key]??""} onChange={e=>setValues({...values,[f.key]:e.target.value})} aria-invalid={!!errors[f.key]} aria-describedby={`hint-${f.key}${errors[f.key]?` error-${f.key}`:""}`} placeholder={f.key==="width"?"예: 400":f.key==="depth"?"예: 500":"예: 100"}/><span>cm</span></div><p className="field-hint" id={`hint-${f.key}`}>{f.hint}</p>{errors[f.key]&&<p className="field-error" id={`error-${f.key}`}>{errors[f.key]}</p>}</div>)}
+            <p className="input-policy">전체 길이는 100~2,000cm, 추가 구간은 10~2,000cm의 정수로 입력해 주세요.</p>
+            <button className="button create-plan" type="submit">{room?"평면도 업데이트":"평면도 만들기"}<span aria-hidden="true">→</span></button>
+            <button className="sample-button" type="button" onClick={sample}>선택한 모양의 예시 방 불러오기</button>
+          </form><p className="field-hint" role="status">{notice}</p>
         </section>
         <section className="plan-card" aria-labelledby="plan-title">
-          <div className="plan-heading"><h2 id="plan-title">나의 2D 평면도</h2><span className="sample-badge">직사각형 방</span></div>
-          {room && plan ? <>
-            <svg className="room-svg" viewBox="0 0 640 480" role="img" aria-label={`가로 ${room.width}cm, 세로 ${room.depth}cm의 직사각형 방 평면도`}>
-              <defs><pattern id={gridId} width="24" height="24" patternUnits="userSpaceOnUse"><path d="M 24 0 L 0 0 0 24" fill="none" stroke="#e4e7df" strokeWidth="1" /></pattern></defs>
-              <rect x="0" y="0" width="640" height="480" fill={`url(#${gridId})`} />
-              <rect x={plan.x} y={plan.y} width={plan.width} height={plan.height} rx="2" fill="#fbfaf4" stroke="#78856b" strokeWidth="6" />
-              <line x1={plan.x} x2={plan.x + plan.width} y1={plan.y - 24} y2={plan.y - 24} stroke="#8c9580" />
-              <text x="320" y={plan.y - 34} textAnchor="middle" className="svg-measure">가로 {room.width} cm</text>
-              <text transform={`translate(${plan.x + plan.width + 34}, 240) rotate(90)`} textAnchor="middle" className="svg-measure">세로 {room.depth} cm</text>
-              <text x="320" y="235" textAnchor="middle" className="svg-area">{(room.width * room.depth / 10000).toFixed(2)} m²</text>
-              <text x="320" y="260" textAnchor="middle" className="svg-caption">나의 방</text>
+          <div className="plan-heading"><h2 id="plan-title">나의 2D 평면도</h2><span className="sample-badge">{shapes.find(s=>s.id===shape)?.name}</span></div>
+          {room&&plan&&metrics?<>
+            <svg className="room-svg" viewBox="0 0 640 480" role="img" aria-label={`${shapes.find(s=>s.id===room.shape)?.name} 방 평면도, 면적 ${(metrics.area/10000).toFixed(2)}제곱미터, 둘레 ${(metrics.perimeter/100).toFixed(2)}미터`}>
+              <defs><pattern id={gridId} width="24" height="24" patternUnits="userSpaceOnUse"><path d="M24 0H0V24" fill="none" stroke="#e4e7df"/></pattern></defs>
+              <rect width="640" height="480" fill={`url(#${gridId})`}/>
+              <polygon points={plan.points.map(p=>`${p.x},${p.y}`).join(" ")} fill="#fbfaf4" stroke="#78856b" strokeWidth="5" strokeLinejoin="round"/>
+              {plan.points.map((p,i)=>{const q=plan.points[(i+1)%plan.points.length],dx=q.x-p.x,dy=q.y-p.y,len=Math.hypot(dx,dy);return <text key={i} x={(p.x+q.x)/2+dy/len*19} y={(p.y+q.y)/2-dx/len*19+5} textAnchor="middle" className="wall-letter">{String.fromCharCode(65+i)}</text>;})}
             </svg>
-            <div className="room-summary" aria-live="polite"><span>가로 <strong>{room.width / 100}m</strong></span><span>세로 <strong>{room.depth / 100}m</strong></span><span>면적 <strong>{(room.width * room.depth / 10000).toFixed(2)}m²</strong></span></div>
-            {changed && <p className="pending-note" role="status">입력값을 변경했어요. 평면도 업데이트를 눌러 반영해 주세요.</p>}
-          </> : <div className="plan-empty"><span className="empty-room" aria-hidden="true" /><h3>나만의 공간을 그려볼까요?</h3><p>방 크기를 입력하거나 예시 방을 선택하면<br />여기에 평면도가 나타나요.</p></div>}
-          <p className="plan-note">입력한 치수에 따른 개략 평면도입니다. 문·창문과 가구는 다음 단계에서 추가됩니다.</p>
+            <div className="room-summary" aria-live="polite"><span>면적 <strong>{(metrics.area/10000).toFixed(2)}m²</strong></span><span>둘레 <strong>{(metrics.perimeter/100).toFixed(2)}m</strong></span><span>외곽 <strong>{room.width/100} × {room.depth/100}m</strong></span></div>
+            {changed&&<p className="pending-note" role="status">입력값을 바꿨어요. 평면도 업데이트를 눌러 반영해 주세요.</p>}
+            <h3 className="wall-list-title">벽을 따라 확인하기</h3><ol className="wall-list">{metrics.walls.map(w=><li key={w.label}><span className="wall-key">{w.label}</span><strong>{w.length} cm</strong></li>)}</ol>
+          </>:<div className="plan-empty"><svg className="shape-guide" viewBox="0 0 64 56" role="img" aria-label={`${shapes.find(s=>s.id===shape)?.name} 입력 참고도`}>{(()=>{const example=parseRoom(shape,{width:"400",depth:"500",cutWidth:"160",cutDepth:"200",leftWing:"100"}).room!;const p=measureRoom(example).points.map(v=>({x:12+v.x*.08,y:6+v.y*.08}));return <><polygon points={p.map(v=>`${v.x},${v.y}`).join(" ")} />{p.map((v,i)=>{const q=p[(i+1)%p.length],dx=q.x-v.x,dy=q.y-v.y,len=Math.hypot(dx,dy);return <text key={i} x={(v.x+q.x)/2+dy/len*5} y={(v.y+q.y)/2-dx/len*5+1.5} textAnchor="middle">{String.fromCharCode(65+i)}</text>;})}</>;})()}</svg><h3>벽의 알파벳을 보고 입력해 주세요</h3><p>예시 방을 불러와 모양을 먼저 확인할 수도 있어요.</p></div>}
+          <p className="plan-note">직각으로 꺾이는 방의 개략 평면도입니다. 길이가 생략된 벽은 선택한 형태에 맞춰 자동 계산됩니다. 사선·곡선 벽과 문·창문은 아직 지원하지 않습니다.</p>
         </section>
-      </div>
-      <p className="builder-footnote">현재는 직사각형 방을 지원해요. 입력한 정보는 새로고침하면 초기화됩니다.</p>
+      </div><p className="builder-footnote">현재 입력은 이 화면에서만 유지되며, 새로고침하면 초기화됩니다.</p>
     </main>
   </>;
 }

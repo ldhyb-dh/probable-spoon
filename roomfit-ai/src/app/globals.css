@@ -103,3 +103,22 @@ button { font-family: inherit; cursor: pointer; }
 .pending-note { font-size: 12px; line-height: 1.7; color: #954323; margin: 15px 0 0; }
 .builder-footnote { margin-top: 22px; }
 @media (max-width: 900px) { .builder-grid { grid-template-columns: 1fr; } .room-form-card, .plan-card { padding: 22px; } .plan-empty { min-height: 260px; } }
+.measurement-tip { padding: 18px 22px; background: #f0f1e8; border: 1px solid #dde2d2; border-radius: 10px; margin-bottom: 26px; }
+.measurement-tip strong { font-size: 13px; }
+.measurement-tip p { color: var(--muted); font-size: 12px; line-height: 1.8; margin: 8px 0 0; }
+.shape-picker { border: 0; margin: 0 0 28px; padding: 0; }
+.shape-picker legend { font-size: 14px; font-weight: 700; margin-bottom: 14px; }
+.shape-options { display: flex; gap: 14px; }
+.shape-option { position: relative; display: flex; align-items: center; justify-content: center; gap: 10px; border: 1px solid var(--line); border-radius: 10px; background: #fffdf9; padding: 14px 20px; cursor: pointer; font-size: 13px; }
+.shape-option.selected { border-color: var(--accent); background: #faf0e9; }
+.shape-option svg { width: 43px; height: 40px; fill: #e0e6d5; stroke: #748265; stroke-width: 2; }
+.shape-option input { accent-color: var(--accent); }
+.wall-letter { font-size: 15px; font-weight: 700; fill: #525d49; paint-order: stroke; stroke: #f6f7f0; stroke-width: 4px; }
+.wall-list-title { margin: 24px 0 12px; font-size: 13px; }
+.wall-list { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+.wall-list li { display: flex; align-items: center; gap: 12px; background: #f2f3ec; padding: 9px 12px; font-size: 12px; border-radius: 5px; }
+.wall-key { color: #5a6a4e; font-weight: 700; }
+.shape-guide { width: 250px; max-width: 100%; height: 210px; }
+.shape-guide polygon { fill: #e8eddd; stroke: #839372; stroke-width: .8; }
+.shape-guide text { fill: #4d5b43; font-size: 4px; font-weight: 700; }
+@media (max-width: 600px) { .shape-options { gap: 8px; } .shape-option { flex: 1; flex-direction: column; gap: 5px; padding: 10px 6px; font-size: 11px; } .shape-option input { position: absolute; left: 5px; top: 5px; } }
