@@ -68,3 +68,38 @@ h3 { margin: 20px 0 12px; font-size: 17px; letter-spacing: -.5px; }
   .footer { align-items: flex-start; flex-direction: column; justify-content: center; gap: 8px; padding-block: 24px; }
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .button { transition: none; } }
+
+.room-builder { padding-block: 35px 70px; }
+.room-builder h1 { font-size: clamp(36px, 4vw, 48px); margin-bottom: 18px; }
+.builder-description { font-size: 14px; color: var(--muted); line-height: 1.8; margin-bottom: 36px; }
+.builder-grid { display: grid; grid-template-columns: 350px minmax(0, 1fr); gap: 28px; align-items: start; }
+.room-form-card, .plan-card { border: 1px solid var(--line); background: #fffdf9; border-radius: 16px; padding: 28px; }
+.room-form-card h2, .plan-card h2 { font-size: 20px; letter-spacing: -.6px; }
+.field-hint { font-size: 11px; line-height: 1.7; color: var(--muted); margin: 8px 0 0; }
+.field-label { display: block; font-size: 13px; font-weight: 700; margin: 25px 0 9px; }
+.dimension-input { position: relative; }
+.dimension-input input { width: 100%; min-height: 50px; border: 1px solid #bdc3b6; border-radius: 7px; padding: 12px 48px 12px 14px; font: inherit; background: white; color: var(--foreground); }
+.dimension-input > span { position: absolute; right: 16px; top: 16px; font-size: 12px; color: var(--muted); pointer-events: none; }
+input:focus-visible, button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.dimension-input input[aria-invalid="true"] { border-color: #b02f2f; }
+.field-error { font-size: 12px; color: #a22424; margin: 8px 0 0; }
+.input-policy { font-size: 11px; color: var(--muted); margin-block: 24px 16px; }
+button { font-family: inherit; cursor: pointer; }
+.create-plan { border: 0; width: 100%; }
+.sample-button { display: block; width: 100%; padding: 16px 0 0; border: 0; background: none; font-size: 11px; color: var(--accent); text-decoration: underline; text-underline-offset: 4px; }
+.plan-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.plan-heading h2 { margin: 0; }
+.room-svg { display: block; width: 100%; height: auto; margin-top: 24px; border-radius: 8px; background: #f3f4ed; }
+.svg-measure { font-size: 15px; fill: #525d49; }
+.svg-area { font-size: 25px; font-weight: 700; fill: #55644a; paint-order: stroke; stroke: #fbfaf4; stroke-width: 5px; }
+.svg-caption { font-size: 13px; fill: #626960; paint-order: stroke; stroke: #fbfaf4; stroke-width: 4px; }
+.room-summary { display: flex; flex-wrap: wrap; gap: 18px; padding: 20px 0 0; font-size: 12px; color: var(--muted); }
+.room-summary strong { color: var(--foreground); margin-left: 4px; }
+.plan-empty { min-height: 340px; display: flex; align-items: center; justify-content: center; flex-direction: column; text-align: center; }
+.empty-room { width: 74px; height: 65px; border: 3px solid #a7b09a; background: #eff1e7; border-radius: 3px; }
+.plan-empty h3 { margin-top: 22px; font-size: 16px; }
+.plan-empty p, .plan-note, .builder-footnote { font-size: 11px; line-height: 1.8; color: var(--muted); }
+.plan-note { border-top: 1px solid var(--line); padding-top: 16px; margin: 20px 0 0; }
+.pending-note { font-size: 12px; line-height: 1.7; color: #954323; margin: 15px 0 0; }
+.builder-footnote { margin-top: 22px; }
+@media (max-width: 900px) { .builder-grid { grid-template-columns: 1fr; } .room-form-card, .plan-card { padding: 22px; } .plan-empty { min-height: 260px; } }
