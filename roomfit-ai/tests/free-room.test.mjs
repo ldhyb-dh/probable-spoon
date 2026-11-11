@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import ts from 'typescript';
 const code=ts.transpileModule(readFileSync(new URL('../src/lib/free-room.ts',import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2020}}).outputText;
-const {analyzeFreeRoom,diagonalExample,curveExample,pointOnWall}=await import('data:text/javascript;base64,'+Buffer.from(code).toString('base64'));
+const {analyzeFreeRoom,diagonalExample,curveExample,pointOnWall,reflectRoom,moveVertex}=await import('data:text/javascript;base64,'+Buffer.from(code).toString('base64'));
 const v=(x,y,bulge=0)=>({x,y,bulge});
 const near=(a,b,e=1e-5)=>assert.ok(Math.abs(a-b)<e,`${a} != ${b}`);
 test('diagonal edges use Euclidean length and polygon area',()=>{
@@ -38,4 +38,24 @@ test('crossing, overlapping, collapsed, invalid and oversized inputs are rejecte
 });
 test('curving into the opposite wall is rejected',()=>{
  const result=analyzeFreeRoom([v(0,0),v(400,0,450),v(400,400),v(0,400)]);assert.ok(result.error);
+});
+
+test('reflection preserves curved area and wall lengths, mirrors all curve points',()=>{
+ for(const axis of ['horizontal','vertical']){
+  const mirrored=reflectRoom(curveExample,axis),a=analyzeFreeRoom(curveExample),b=analyzeFreeRoom(mirrored);
+  assert.equal(b.error,'');near(a.area,b.area);near(a.perimeter,b.perimeter);
+  assert.deepEqual(reflectRoom(mirrored,axis),curveExample);
+  for(let i=0;i<curveExample.length;i++)for(const t of [0,.25,.5,.75,1]){
+   const p=pointOnWall(curveExample[i],curveExample[(i+1)%curveExample.length],t),q=pointOnWall(mirrored[i],mirrored[(i+1)%mirrored.length],t);
+   near(q.x,axis==='horizontal'?400-p.x:p.x);near(q.y,axis==='vertical'?400-p.y:p.y);
+  }
+ }
+});
+test('moving vertices uses original drag position, clamps, rounds, and avoids collapsed neighbors',()=>{
+ const moved=moveVertex(diagonalExample,1,50.4,30.7);
+ assert.equal(moved[1].x,450);assert.equal(moved[1].y,31);assert.equal(diagonalExample[1].x,400);
+ assert.equal(moveVertex(diagonalExample,1,5000,5000)[1].x,2000);
+ assert.deepEqual(moveVertex(diagonalExample,1,-400,0),diagonalExample);
+ assert.deepEqual(moveVertex(diagonalExample,1,NaN,0),diagonalExample);
+ assert.equal(analyzeFreeRoom(moved).error,'');
 });

@@ -6,6 +6,8 @@ import { fieldsFor, fitRoom, measureRoom, parseRoom, shapes } from "@/lib/room";
 import type { FieldKey, Room, RoomErrors, RoomShape } from "@/lib/room";
 
 export default function NewRoom() {
+  const [horizontal,setHorizontal]=useState(false);
+  const [vertical,setVertical]=useState(false);
   const [shape,setShape]=useState<RoomShape>("rectangle");
   const [values,setValues]=useState<Partial<Record<FieldKey,string>>>({});
   const [room,setRoom]=useState<Room|null>(null);
@@ -14,7 +16,9 @@ export default function NewRoom() {
   const formRef=useRef<HTMLFormElement>(null);
   const gridId=useId();
   const fields=fieldsFor(shape);
-  const plan=room?fitRoom(room):null, metrics=room?measureRoom(room):null;
+  const basePlan=room?fitRoom(room):null, metrics=room?measureRoom(room):null;
+  const plan=basePlan?{...basePlan,points:basePlan.points.map(p=>({x:horizontal?640-p.x:p.x,y:vertical?480-p.y:p.y}))}:null;
+  const orientation=horizontal!==vertical?-1:1;
   const changed=room && fields.some(f=>Number(values[f.key])!==room[f.key]);
   function submit(e:FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -26,7 +30,7 @@ export default function NewRoom() {
     const v={width:"400",depth:"500",cutWidth:shape==="u"?"160":"180",cutDepth:"200",leftWing:"100"};
     setValues(v);setErrors({});setRoom(parseRoom(shape,v).room);setNotice("예시 방을 불러왔어요.");
   }
-  function select(next:RoomShape){setShape(next);setRoom(null);setErrors({});setNotice("");}
+  function select(next:RoomShape){setHorizontal(false);setVertical(false);setShape(next);setRoom(null);setErrors({});setNotice("");}
   return <>
     <a className="skip-link" href="#room-main">본문 바로가기</a>
     <header className="header container"><Link href="/" className="brand" aria-label="RoomFit AI 홈"><span className="brand-icon" aria-hidden="true">⌑</span>RoomFit <span className="brand-ai">AI</span></Link><Link href="/" className="nav-link">← 홈으로 돌아가기</Link></header>
@@ -49,12 +53,13 @@ export default function NewRoom() {
         </section>
         <section className="plan-card" aria-labelledby="plan-title">
           <div className="plan-heading"><h2 id="plan-title">나의 2D 평면도</h2><span className="sample-badge">{shapes.find(s=>s.id===shape)?.name}</span></div>
+          <div className="plan-transforms"><button type="button" disabled={!room} aria-pressed={horizontal} onClick={()=>setHorizontal(!horizontal)}>↔ 좌우 반전</button><button type="button" disabled={!room} aria-pressed={vertical} onClick={()=>setVertical(!vertical)}>↕ 상하 반전</button></div>
           {room&&plan&&metrics?<>
             <svg className="room-svg" viewBox="0 0 640 480" role="img" aria-label={`${shapes.find(s=>s.id===room.shape)?.name} 방 평면도, 면적 ${(metrics.area/10000).toFixed(2)}제곱미터, 둘레 ${(metrics.perimeter/100).toFixed(2)}미터`}>
               <defs><pattern id={gridId} width="24" height="24" patternUnits="userSpaceOnUse"><path d="M24 0H0V24" fill="none" stroke="#e4e7df"/></pattern></defs>
               <rect width="640" height="480" fill={`url(#${gridId})`}/>
               <polygon points={plan.points.map(p=>`${p.x},${p.y}`).join(" ")} fill="#fbfaf4" stroke="#78856b" strokeWidth="5" strokeLinejoin="round"/>
-              {plan.points.map((p,i)=>{const q=plan.points[(i+1)%plan.points.length],dx=q.x-p.x,dy=q.y-p.y,len=Math.hypot(dx,dy);return <text key={i} x={(p.x+q.x)/2+dy/len*19} y={(p.y+q.y)/2-dx/len*19+5} textAnchor="middle" className="wall-letter">{String.fromCharCode(65+i)}</text>;})}
+              {plan.points.map((p,i)=>{const q=plan.points[(i+1)%plan.points.length],dx=q.x-p.x,dy=q.y-p.y,len=Math.hypot(dx,dy);return <text key={i} x={(p.x+q.x)/2+dy/len*19*orientation} y={(p.y+q.y)/2-dx/len*19*orientation+5} textAnchor="middle" className="wall-letter">{String.fromCharCode(65+i)}</text>;})}
             </svg>
             <div className="room-summary" aria-live="polite"><span>면적 <strong>{(metrics.area/10000).toFixed(2)}m²</strong></span><span>둘레 <strong>{(metrics.perimeter/100).toFixed(2)}m</strong></span><span>외곽 <strong>{room.width/100} × {room.depth/100}m</strong></span></div>
             {changed&&<p className="pending-note" role="status">입력값을 바꿨어요. 평면도 업데이트를 눌러 반영해 주세요.</p>}

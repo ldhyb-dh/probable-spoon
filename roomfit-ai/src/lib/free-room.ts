@@ -51,3 +51,19 @@ export function analyzeFreeRoom(vertices:Vertex[]) {
   if(Math.abs(signedArea)<1)return invalid('면적이 너무 작거나 점들이 일직선이에요.');
   return {error:'',area:Math.abs(signedArea),perimeter:lengths.reduce((a,b)=>a+b,0),lengths,outline};
 }
+
+// Reflection reverses orientation, so the signed curve offset must reverse too.
+export function reflectRoom(vertices:Vertex[],axis:'horizontal'|'vertical'):Vertex[]{
+  const key=axis==='horizontal'?'x':'y';
+  const center=Math.min(...vertices.map(p=>p[key]))+Math.max(...vertices.map(p=>p[key]));
+  return vertices.map(p=>({...p,[key]:center-p[key],bulge:p.bulge===0?0:-p.bulge}));
+}
+// Delta is measured in room cm against the viewport frozen at pointer-down.
+export function moveVertex(vertices:Vertex[],index:number,dx:number,dy:number):Vertex[]{
+  if(!vertices[index]||!Number.isFinite(dx)||!Number.isFinite(dy))return vertices;
+  const clamp=(n:number)=>Math.max(-2000,Math.min(2000,Math.round(n)));
+  const point={...vertices[index],x:clamp(vertices[index].x+dx),y:clamp(vertices[index].y+dy)};
+  const previous=vertices[(index+vertices.length-1)%vertices.length],next=vertices[(index+1)%vertices.length];
+  if(Math.hypot(point.x-previous.x,point.y-previous.y)<1||Math.hypot(point.x-next.x,point.y-next.y)<1)return vertices;
+  return vertices.map((p,i)=>i===index?point:p);
+}
