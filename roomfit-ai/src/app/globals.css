@@ -122,3 +122,12 @@ button { font-family: inherit; cursor: pointer; }
 .shape-guide polygon { fill: #e8eddd; stroke: #839372; stroke-width: .8; }
 .shape-guide text { fill: #4d5b43; font-size: 4px; font-weight: 700; }
 @media (max-width: 600px) { .shape-options { gap: 8px; } .shape-option { flex: 1; flex-direction: column; gap: 5px; padding: 10px 6px; font-size: 11px; } .shape-option input { position: absolute; left: 5px; top: 5px; } }
+.custom-presets, .custom-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0; }
+.custom-presets button, .custom-actions button { border: 1px solid #c4c9bc; background: #fffdf9; padding: 11px 15px; border-radius: 7px; font-size: 12px; color: #4a5343; }
+.custom-actions button:disabled { opacity: .45; cursor: not-allowed; }
+.vertex-tabs { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 20px; }
+.vertex-tabs button { border: 1px solid #c4c9bc; width: 35px; height: 35px; border-radius: 6px; background: white; color: #555; }
+.vertex-tabs button[aria-pressed="true"] { color: white; background: var(--accent); border-color: var(--accent); }
+.bulge-slider { width: 100%; accent-color: var(--accent); margin-top: 18px; }
+.custom-entry { display: inline-flex; border: 1px solid var(--accent); color: var(--accent); padding: 12px 18px; border-radius: 8px; margin-bottom: 25px; font-size: 13px; font-weight: 700; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }

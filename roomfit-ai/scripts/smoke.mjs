@@ -24,6 +24,7 @@ try {
   for (const [path, status, text] of [
     ['/', 200, '같은 방,'],
     ['/room/new', 200, '방 크기 입력'],
+    ['/room/custom', 200, '꼭짓점 · 벽 편집'],
     ['/missing-page', 404, '404'],
   ]) {
     const response = await fetch(`${base}${path}`, { signal: AbortSignal.timeout(10000) });

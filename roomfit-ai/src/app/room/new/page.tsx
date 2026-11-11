@@ -35,6 +35,7 @@ export default function NewRoom() {
       <h1>우리 방 모양대로,<br/><span>벽을 따라 그려요.</span></h1>
       <p className="builder-description">방 형태를 고르고 벽 안쪽 길이를 입력해 주세요. 들어간 공간까지 반영해 평면도를 만들어요.</p>
       <aside className="measurement-tip"><strong>둘레만 알면 방을 그릴 수 있나요?</strong><p>둘레의 총길이가 같아도 방의 모양과 면적은 달라질 수 있어요. 방 형태와 필요한 벽 길이를 함께 입력하면 나머지 벽 길이와 둘레를 계산해 드려요.</p></aside>
+      <Link className="custom-entry" href="/room/custom">사선·곡선 벽 직접 그리기 →</Link>
       <fieldset className="shape-picker"><legend>1. 방 형태 선택</legend><div className="shape-options">{shapes.map(s=><label key={s.id} className={`shape-option ${shape===s.id?"selected":""}`}><input type="radio" name="shape" value={s.id} checked={shape===s.id} onChange={()=>select(s.id)}/><svg viewBox="0 0 64 56" aria-hidden="true"><path d={s.path}/></svg><span>{s.name}</span></label>)}</div></fieldset>
       <div className="builder-grid">
         <section className="room-form-card" aria-labelledby="dimensions-title">
@@ -59,7 +60,7 @@ export default function NewRoom() {
             {changed&&<p className="pending-note" role="status">입력값을 바꿨어요. 평면도 업데이트를 눌러 반영해 주세요.</p>}
             <h3 className="wall-list-title">벽을 따라 확인하기</h3><ol className="wall-list">{metrics.walls.map(w=><li key={w.label}><span className="wall-key">{w.label}</span><strong>{w.length} cm</strong></li>)}</ol>
           </>:<div className="plan-empty"><svg className="shape-guide" viewBox="0 0 64 56" role="img" aria-label={`${shapes.find(s=>s.id===shape)?.name} 입력 참고도`}>{(()=>{const example=parseRoom(shape,{width:"400",depth:"500",cutWidth:"160",cutDepth:"200",leftWing:"100"}).room!;const p=measureRoom(example).points.map(v=>({x:12+v.x*.08,y:6+v.y*.08}));return <><polygon points={p.map(v=>`${v.x},${v.y}`).join(" ")} />{p.map((v,i)=>{const q=p[(i+1)%p.length],dx=q.x-v.x,dy=q.y-v.y,len=Math.hypot(dx,dy);return <text key={i} x={(v.x+q.x)/2+dy/len*5} y={(v.y+q.y)/2-dx/len*5+1.5} textAnchor="middle">{String.fromCharCode(65+i)}</text>;})}</>;})()}</svg><h3>벽의 알파벳을 보고 입력해 주세요</h3><p>예시 방을 불러와 모양을 먼저 확인할 수도 있어요.</p></div>}
-          <p className="plan-note">직각으로 꺾이는 방의 개략 평면도입니다. 길이가 생략된 벽은 선택한 형태에 맞춰 자동 계산됩니다. 사선·곡선 벽과 문·창문은 아직 지원하지 않습니다.</p>
+          <p className="plan-note">직각으로 꺾이는 방의 개략 평면도입니다. 길이가 생략된 벽은 선택한 형태에 맞춰 자동 계산됩니다. 사선·곡선 벽은 위의 직접 그리기에서 만들 수 있어요. 문·창문은 다음 단계에 추가됩니다.</p>
         </section>
       </div><p className="builder-footnote">현재 입력은 이 화면에서만 유지되며, 새로고침하면 초기화됩니다.</p>
     </main>
