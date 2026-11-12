@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 const features = [
-  { number: "01", title: "내 방부터 이해하기", description: "기본 방 형태를 선택하거나 사선·곡선 벽을 직접 그려 평면도와 면적·둘레를 확인해요." },
+  { number: "01", title: "내 방부터 이해하기", description: "기본 방 형태를 선택하거나 사선·곡선 벽을 직접 그리고, 문·창문의 위치까지 배치해요." },
   { number: "02", title: "있는 가구, 새롭게", description: "침대와 책상 등 기존 가구의 크기를 반영해 공간과 생활 동선에 맞는 배치를 제안할 예정이에요." },
   { number: "03", title: "필요한 가구만 더하기", description: "남은 공간과 예산에 어울리는 새 가구를 찾아, 구매 전 배치를 비교할 수 있도록 만들어요." },
 ];

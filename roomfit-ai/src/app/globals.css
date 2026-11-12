@@ -138,3 +138,17 @@ button { font-family: inherit; cursor: pointer; }
 .vertex-handle { cursor: grab; outline: none; }
 .vertex-handle:focus-visible circle { stroke: #262e24; stroke-width: 4px; }
 .is-dragging, .is-dragging .vertex-handle { cursor: grabbing; }
+.opening-editor { border: 1px solid var(--line); background: #fffdf9; padding: 26px; border-radius: 14px; margin-top: 28px; }
+.opening-editor h2 { font-size: 21px; }
+.opening-fields { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; margin-top: 20px; }
+.opening-fields label { font-size: 12px; font-weight: 700; }
+.opening-fields input, .opening-fields select { display: block; width: 100%; min-width: 0; min-height: 44px; border: 1px solid #bbc2b2; background: white; border-radius: 6px; padding: 10px; margin-top: 8px; font: inherit; color: var(--foreground); }
+.opening-list { padding: 0; list-style: none; margin: 18px 0; }
+.opening-list li { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 15px 0; border-top: 1px solid var(--line); }
+.opening-list strong, .opening-list span { display: block; font-size: 12px; line-height: 1.9; }
+.opening-list span { color: var(--muted); }
+.opening-row-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.opening-row-actions button { border: 1px solid #d0d2c8; border-radius: 5px; padding: 8px 12px; background: white; font-size: 12px; }
+.opening-legend { display: flex; flex-wrap: wrap; gap: 20px; font-size: 11px; margin-bottom: 0; }
+.opening-legend span:first-child { color: #ae572b; }.opening-legend span:last-child { color: #2679a4; }
+@media (max-width: 600px) { .opening-fields { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; } .opening-editor { padding: 20px; } }

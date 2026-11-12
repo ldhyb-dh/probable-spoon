@@ -67,3 +67,48 @@ export function moveVertex(vertices:Vertex[],index:number,dx:number,dy:number):V
   if(Math.hypot(point.x-previous.x,point.y-previous.y)<1||Math.hypot(point.x-next.x,point.y-next.y)<1)return vertices;
   return vertices.map((p,i)=>i===index?point:p);
 }
+
+export type Opening={id:string;type:'door'|'window';wall:number;offset:number;width:number;hinge:'start'|'end';swing:'inside'|'outside'};
+export function wallLength(a:Vertex,b:Vertex){return integrate(t=>{const d=derivative(a,b,t);return Math.hypot(d.x,d.y);});}
+export function validateOpening(vertices:Vertex[],opening:Opening,all:Opening[]=[]):string{
+  if(!Number.isInteger(opening.wall)||opening.wall<0||opening.wall>=vertices.length)return '벽을 다시 선택해 주세요.';
+  if(!Number.isFinite(opening.offset)||opening.offset<0||!Number.isFinite(opening.width)||opening.width<10)return '시작 거리는 0 이상, 폭은 10cm 이상이어야 해요.';
+  const a=vertices[opening.wall],b=vertices[(opening.wall+1)%vertices.length];
+  if(![a.x,a.y,a.bulge,b.x,b.y].every(Number.isFinite)||Math.hypot(a.x-b.x,a.y-b.y)<1)return '먼저 유효한 방 치수를 입력해 주세요.';
+  if(opening.type==='door'&&a.bulge!==0)return '문은 직선·사선 벽에 배치할 수 있어요. 곡선 벽에는 창문을 선택해 주세요.';
+  if(opening.offset+opening.width>wallLength(a,b)+1e-6)return '문·창문이 벽 끝을 넘어가요. 시작 거리 또는 폭을 줄여 주세요.';
+  if(all.some(o=>o.id!==opening.id&&o.wall===opening.wall&&opening.offset<o.offset+o.width-1e-6&&o.offset<opening.offset+opening.width-1e-6))return '같은 벽의 다른 문·창문과 겹쳐 있어요.';
+  return '';
+}
+// Map arc-length distance to the quadratic parameter with a 128-step lookup.
+export function pointAtWallDistance(a:Vertex,b:Vertex,distance:number):XY{
+  const length=wallLength(a,b);
+  if(!a.bulge)return pointOnWall(a,b,Math.max(0,Math.min(1,distance/length)));
+  const samples=Array.from({length:129},(_,i)=>pointOnWall(a,b,i/128));
+  const lengths=[0];for(let i=1;i<samples.length;i++)lengths.push(lengths[i-1]+Math.hypot(samples[i].x-samples[i-1].x,samples[i].y-samples[i-1].y));
+  const target=Math.max(0,Math.min(1,distance/length))*lengths[128];
+  const index=Math.max(1,lengths.findIndex(l=>l>=target));
+  const t=(index-1+(target-lengths[index-1])/(lengths[index]-lengths[index-1]))/128;
+  return pointOnWall(a,b,t);
+}
+export function openingGeometry(vertices:Vertex[],o:Opening){
+  const a=vertices[o.wall],b=vertices[(o.wall+1)%vertices.length];
+  const path=Array.from({length:17},(_,i)=>pointAtWallDistance(a,b,o.offset+o.width*i/16));
+  const start=path[0],end=path[16];
+  const hinge=o.hinge==='start'?start:end,closed=o.hinge==='start'?end:start;
+  const length=Math.hypot(end.x-start.x,end.y-start.y),ux=(end.x-start.x)/length,uy=(end.y-start.y)/length;
+  const orientation=Math.sign(vertices.reduce((sum,p,i)=>{const q=vertices[(i+1)%vertices.length];return sum+integrate(t=>{const v=pointOnWall(p,q,t),d=derivative(p,q,t);return v.x*d.y-v.y*d.x;});},0))||1;
+  const side=orientation*(o.swing==='inside'?1:-1),nx=-uy*side,ny=ux*side;
+  const base={x:(closed.x-hinge.x)/length,y:(closed.y-hinge.y)/length};
+  const arc=Array.from({length:17},(_,i)=>{const t=i/16*Math.PI/2;return {x:hinge.x+o.width*(base.x*Math.cos(t)+nx*Math.sin(t)),y:hinge.y+o.width*(base.y*Math.cos(t)+ny*Math.sin(t))};});
+  return {path,start,end,hinge,leaf:arc[16],arc};
+}
+// Keep unaffected wall bindings; changed walls require explicit reassignment.
+export function remapOpenings(all:Opening[],index:number,action:'insert'|'remove',count:number):Opening[]{
+  return all.map(o=>{
+    if(o.wall<0)return o;
+    if(action==='insert')return {...o,wall:o.wall===index?-1:o.wall>index?o.wall+1:o.wall};
+    const previous=(index+count-1)%count;
+    return {...o,wall:o.wall===index||o.wall===previous?-1:o.wall>index?o.wall-1:o.wall};
+  });
+}

@@ -31,6 +31,7 @@ try {
     assert.equal(response.status, status, path);
     const html = await response.text();
     assert.ok(html.includes(text), `${path}: expected page text`);
+    if (path === '/room/custom') assert.ok(html.includes('문·창문 배치'), 'Opening editor is present');
     if (path === '/') {
       assert.ok(html.includes('href="/room/new"'), 'Start link destination');
       const css = html.match(/href="([^\"]+\.css[^\"]*)"/);
