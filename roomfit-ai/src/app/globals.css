@@ -164,3 +164,17 @@ button { font-family: inherit; cursor: pointer; }
 .placement-confirm:disabled { opacity: .4; cursor: not-allowed; }
 .placement-status { color: #347242; font-size: 12px; line-height: 1.8; }
 .placing-opening,.placing-opening .vertex-handle { cursor: crosshair; touch-action: none; }
+
+.furniture-toolbar { border: 1px solid #dedfd4; background: #f5f2e9; border-radius: 10px; padding: 16px; margin-top: 18px; }
+.furniture-toolbar h3 { margin: 0 0 12px; font-size: 16px; }
+.furniture-presets { display: flex; flex-wrap: wrap; gap: 8px; }
+.furniture-presets button { display: flex; flex-direction: column; align-items: center; gap: 5px; border: 1px solid #c7cbbb; border-radius: 7px; background: white; padding: 10px 13px; color: #4a5840; font-size: 11px; }
+.furniture-presets button span { font-size: 23px; }
+.furniture-presets button[aria-pressed="true"] { border: 2px solid #61804d; background: #e5efdd; }
+.furniture-fields { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; margin-top: 16px; }
+.furniture-fields label { font-size: 11px; color: var(--muted); }
+.furniture-fields input { width: 100%; min-width: 0; border: 1px solid #c3c8b9; border-radius: 5px; background: white; padding: 8px; margin-top: 5px; color: var(--foreground); font: inherit; }
+.furniture-item:focus-visible { outline: none; }.furniture-item:focus-visible polygon { stroke-width: 4px; }
+.furniture-toolbar button:disabled { opacity: .45; cursor: not-allowed; }
+
+.furniture-canvas { touch-action: none; }
