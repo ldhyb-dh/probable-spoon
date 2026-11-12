@@ -112,3 +112,25 @@ export function remapOpenings(all:Opening[],index:number,action:'insert'|'remove
     return {...o,wall:o.wall===index||o.wall===previous?-1:o.wall>index?o.wall-1:o.wall};
   });
 }
+
+export function nearestOpeningPosition(vertices:Vertex[],pointer:XY,project:(p:XY)=>XY,width:number,maxDistance=24):{wall:number;offset:number;distance:number}|null{
+  let best:{wall:number;offset:number;distance:number}|null=null;
+  vertices.forEach((a,wall)=>{
+    const b=vertices[(wall+1)%vertices.length];
+    if(![a.x,a.y,a.bulge,b.x,b.y].every(Number.isFinite)||Math.hypot(b.x-a.x,b.y-a.y)<1)return;
+    const count=a.bulge?128:1;
+    const points=Array.from({length:count+1},(_,i)=>pointOnWall(a,b,i/count));
+    const distances=[0];for(let i=1;i<points.length;i++)distances.push(distances[i-1]+Math.hypot(points[i].x-points[i-1].x,points[i].y-points[i-1].y));
+    const length=wallLength(a,b);
+    for(let i=1;i<points.length;i++){
+      const p=project(points[i-1]),q=project(points[i]),dx=q.x-p.x,dy=q.y-p.y,n=dx*dx+dy*dy;
+      if(!n)continue;
+      const u=Math.max(0,Math.min(1,((pointer.x-p.x)*dx+(pointer.y-p.y)*dy)/n));
+      const distance=Math.hypot(pointer.x-p.x-u*dx,pointer.y-p.y-u*dy);
+      if(distance>maxDistance||(best!==null&&distance>=best.distance))continue;
+      const center=(distances[i-1]+u*(distances[i]-distances[i-1]))/distances[count]*length;
+      best={wall,offset:Math.min(Math.max(0,length-width),Math.round(Math.max(0,center-width/2)*10)/10),distance};
+    }
+  });
+  return best;
+}

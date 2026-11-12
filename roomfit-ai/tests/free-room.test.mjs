@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import ts from 'typescript';
 const code=ts.transpileModule(readFileSync(new URL('../src/lib/free-room.ts',import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2020}}).outputText;
-const {analyzeFreeRoom,diagonalExample,curveExample,pointOnWall,reflectRoom,moveVertex,validateOpening,openingGeometry,pointAtWallDistance,remapOpenings}=await import('data:text/javascript;base64,'+Buffer.from(code).toString('base64'));
+const {analyzeFreeRoom,diagonalExample,curveExample,pointOnWall,reflectRoom,moveVertex,validateOpening,openingGeometry,pointAtWallDistance,remapOpenings,nearestOpeningPosition}=await import('data:text/javascript;base64,'+Buffer.from(code).toString('base64'));
 const v=(x,y,bulge=0)=>({x,y,bulge});
 const near=(a,b,e=1e-5)=>assert.ok(Math.abs(a-b)<e,`${a} != ${b}`);
 test('diagonal edges use Euclidean length and polygon area',()=>{
@@ -108,4 +108,24 @@ test('door swing and hinge reflect without changing opening direction relative t
   const a=openingGeometry(diagonalExample,o),b=openingGeometry(reflectRoom(diagonalExample,axis),o);
   for(const key of ['hinge','leaf']){near(b[key].x,axis==='horizontal'?480-a[key].x:a[key].x);near(b[key].y,axis==='vertical'?400-a[key].y:a[key].y);}
  }
+});
+
+
+test('pointer placement snaps to straight/slanted walls and clamps the entire opening',()=>{
+ const points=[v(0,0),v(400,0),v(400,400),v(0,400)],project=p=>p;
+ let hit=nearestOpeningPosition(points,{x:200,y:5},project,80,24);assert.equal(hit.wall,0);near(hit.offset,160);
+ hit=nearestOpeningPosition(points,{x:395,y:0},project,80,24);near(hit.offset,320);
+ assert.equal(nearestOpeningPosition(points,{x:200,y:200},project,80,24),null);
+ const slope=[v(0,0),v(300,400),v(-100,500)];hit=nearestOpeningPosition(slope,{x:150,y:200},project,80,24);assert.equal(hit.wall,0);near(hit.offset,210);
+});
+test('pointer placement handles reflected/scaled viewports and curved walls',()=>{
+ const project=p=>({x:600-p.x*.5,y:40+p.y*.5});
+ const points=[v(0,0),v(400,0),v(400,400),v(0,400)];
+ const hit=nearestOpeningPosition(points,project({x:200,y:0}),project,80,24);assert.equal(hit.wall,0);near(hit.offset,160);
+ const mid=pointOnWall(curveExample[1],curveExample[2],.5);
+ const curved=nearestOpeningPosition(curveExample,mid,p=>p,100,24);assert.equal(curved.wall,1);assert.ok(curved.offset>150);
+ const item={id:'preview',type:'window',wall:curved.wall,offset:curved.offset,width:100,hinge:'start',swing:'inside'};
+ assert.equal(validateOpening(curveExample,item),'');
+ const nearEnd=nearestOpeningPosition(curveExample,pointOnWall(curveExample[1],curveExample[2],.98),p=>p,100,24);
+ assert.equal(validateOpening(curveExample,{...item,wall:nearEnd.wall,offset:nearEnd.offset}),'');
 });

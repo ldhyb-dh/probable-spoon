@@ -62,3 +62,5 @@ npm run verify
 사선·곡선 기능의 입력 방법과 계산 한계는 [자유형 방 기록](docs/free-room.md)을 참고하세요.
 
 [3일차 작업 기록](docs/day-03.md)
+
+[아이콘 직접 배치·미리보기 사용법](docs/opening-placement.md)
