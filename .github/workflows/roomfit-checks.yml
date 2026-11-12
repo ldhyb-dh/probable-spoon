@@ -1,0 +1,26 @@
+name: RoomFit checks
+on:
+  push:
+    branches: [roomfit/day-04-furniture]
+  pull_request:
+    paths:
+      - 'roomfit-ai/**'
+      - '.github/workflows/roomfit-checks.yml'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: roomfit-ai
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: roomfit-ai/package-lock.json
+      - run: npm ci --no-fund
+      - run: npm run verify
