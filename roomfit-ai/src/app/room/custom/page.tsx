@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import {SavedPlans} from "@/components/saved-plans";
 import {useFurniture,FurnitureToolbar,FurnitureMarks,FurnitureList} from "@/components/furniture";
 
 import {OpeningEditor,OpeningMarks} from "@/components/openings";
@@ -102,7 +103,7 @@ export default function CustomRoom(){
           {result.error?<p className="field-error" role="alert">{result.error}</p>:<><div className="room-summary" aria-live="polite"><span>면적 <strong>{(result.area/10000).toFixed(2)}m²</strong></span><span>둘레 <strong>{(result.perimeter/100).toFixed(2)}m</strong></span></div><h3 className="wall-list-title">벽별 길이</h3><ol className="wall-list">{result.lengths.map((length,i)=><li key={i}><span className="wall-key">벽 {i+1}</span><strong>{length.toFixed(1)} cm</strong>{numeric[i].bulge!==0&&<span>곡선</span>}</li>)}</ol></>}
           <p className="plan-note">곡선은 중앙 휘어짐으로 정의한 2차 베지어 곡선이며 원호와는 다릅니다. 곡선 길이는 수치 계산한 근삿값이에요. 벽 교차 검사는 곡선을 64구간으로 나눠 확인합니다. 시공용 실측 도면으로 사용할 수는 없습니다.</p>
         </section>
-      </div>{safe&&!result.error&&<FurnitureList controller={furniture}/>} {safe&&!result.error?<OpeningEditor key={numeric.length} vertices={numeric} items={openings} onChange={next=>{placement.cancel();setOpenings(next);}} onEdit={placement.edit}/>:openings.length>0&&<p className="field-hint">방 모양을 먼저 수정하면 문·창문 편집이 다시 나타납니다.</p>}<p className="builder-footnote">변경은 즉시 반영됩니다. 새로고침하면 예시 방으로 초기화됩니다.</p>
+      </div><SavedPlans mode="custom" snapshot={()=>safe&&!result.error?{mode:'custom',vertices:numeric,openings,furniture:furniture.items}:null} onLoad={saved=>{if(saved.mode!=='custom')return;placement.cancel();furniture.restore(saved.furniture);setDraft(draftOf(saved.vertices));setOpenings(saved.openings);setSelected(0);setNotice('저장된 평면도를 불러왔어요.');}}/>{safe&&!result.error&&<FurnitureList controller={furniture}/>} {safe&&!result.error?<OpeningEditor key={numeric.length} vertices={numeric} items={openings} onChange={next=>{placement.cancel();setOpenings(next);}} onEdit={placement.edit}/>:openings.length>0&&<p className="field-hint">방 모양을 먼저 수정하면 문·창문 편집이 다시 나타납니다.</p>}<p className="builder-footnote">저장하지 않은 변경 사항은 새로고침하면 초기화됩니다. 저장한 배치는 이 브라우저에서 불러올 수 있어요.</p>
     </main>
   </>;
 }

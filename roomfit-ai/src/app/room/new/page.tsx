@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import {SavedPlans} from "@/components/saved-plans";
 import {useFurniture,FurnitureToolbar,FurnitureMarks,FurnitureList} from "@/components/furniture";
 
 import {OpeningEditor,OpeningMarks} from "@/components/openings";
@@ -82,7 +83,7 @@ export default function NewRoom() {
           </>:<div className="plan-empty"><svg className="shape-guide" viewBox="0 0 64 56" role="img" aria-label={`${shapes.find(s=>s.id===shape)?.name} 입력 참고도`}>{(()=>{const example=parseRoom(shape,{width:"400",depth:"500",cutWidth:"160",cutDepth:"200",leftWing:"100"}).room!;const p=measureRoom(example).points.map(v=>({x:12+v.x*.08,y:6+v.y*.08}));return <><polygon points={p.map(v=>`${v.x},${v.y}`).join(" ")} />{p.map((v,i)=>{const q=p[(i+1)%p.length],dx=q.x-v.x,dy=q.y-v.y,len=Math.hypot(dx,dy);return <text key={i} x={(v.x+q.x)/2+dy/len*5} y={(v.y+q.y)/2-dx/len*5+1.5} textAnchor="middle">{String.fromCharCode(65+i)}</text>;})}</>;})()}</svg><h3>벽의 알파벳을 보고 입력해 주세요</h3><p>예시 방을 불러와 모양을 먼저 확인할 수도 있어요.</p></div>}
           <p className="plan-note">직각으로 꺾이는 방의 개략 평면도입니다. 길이가 생략된 벽은 선택한 형태에 맞춰 자동 계산됩니다. 사선·곡선 벽은 위의 직접 그리기에서 만들 수 있어요. 아래에서 문·창문을 추가할 수 있어요.</p>
         </section>
-      </div>{room&&<FurnitureList controller={furniture}/>} {room&&<OpeningEditor key={shape} vertices={vertices} items={openings} onChange={next=>{placement.cancel();setOpenings(next);}} onEdit={placement.edit} labels={metrics?.walls.map(w=>w.label)}/>}<p className="builder-footnote">현재 입력은 이 화면에서만 유지되며, 새로고침하면 초기화됩니다.</p>
+      </div><SavedPlans mode="template" snapshot={()=>room?{mode:'template',room,horizontal,vertical,openings,furniture:furniture.items}:null} onLoad={saved=>{if(saved.mode!=='template')return;placement.cancel();furniture.restore(saved.furniture);setShape(saved.room.shape);setValues(Object.fromEntries(fieldsFor(saved.room.shape).map(f=>[f.key,String(saved.room[f.key])])));setRoom(saved.room);setHorizontal(saved.horizontal);setVertical(saved.vertical);setOpenings(saved.openings);setErrors({});setNotice('저장된 평면도를 불러왔어요.');}}/>{room&&<FurnitureList controller={furniture}/>} {room&&<OpeningEditor key={shape} vertices={vertices} items={openings} onChange={next=>{placement.cancel();setOpenings(next);}} onEdit={placement.edit} labels={metrics?.walls.map(w=>w.label)}/>}<p className="builder-footnote">저장하지 않은 변경 사항은 새로고침하면 초기화됩니다. 저장한 배치는 이 브라우저에서 불러올 수 있어요.</p>
     </main>
   </>;
 }

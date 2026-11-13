@@ -1,10 +1,23 @@
 
 export const furniturePresets=[
- {kind:'bed',name:'침대',width:100,depth:200,icon:'🛏'},
- {kind:'desk',name:'책상',width:120,depth:60,icon:'▤'},
- {kind:'wardrobe',name:'옷장',width:120,depth:60,icon:'▥'},
- {kind:'sofa',name:'소파',width:180,depth:80,icon:'🛋'},
- {kind:'table',name:'테이블',width:100,depth:100,icon:'▦'}
+ {kind:'bed',name:'침대',width:100,depth:200,icon:'🛏',category:'침실·작업'},
+ {kind:'desk',name:'책상',width:120,depth:60,icon:'▤',category:'침실·작업'},
+ {kind:'chair',name:'의자',width:50,depth:50,icon:'🪑',category:'침실·작업'},
+ {kind:'wardrobe',name:'옷장',width:120,depth:60,icon:'▥',category:'수납'},
+ {kind:'bookshelf',name:'책장',width:80,depth:30,icon:'▦',category:'수납'},
+ {kind:'drawer',name:'서랍장',width:80,depth:45,icon:'▤',category:'수납'},
+ {kind:'shoe-cabinet',name:'신발장',width:80,depth:35,icon:'▥',category:'수납'},
+ {kind:'hanger',name:'행거',width:90,depth:45,icon:'♧',category:'수납'},
+ {kind:'sofa',name:'소파',width:180,depth:80,icon:'🛋',category:'거실'},
+ {kind:'table',name:'테이블',width:100,depth:100,icon:'▦',category:'거실'},
+ {kind:'tv',name:'TV·거치대',width:120,depth:40,icon:'▣',category:'거실'},
+ {kind:'fridge',name:'냉장고',width:75,depth:75,icon:'▥',category:'주방·가전'},
+ {kind:'sink',name:'싱크대',width:120,depth:60,icon:'▱',category:'주방·가전'},
+ {kind:'dining-table',name:'식탁',width:120,depth:80,icon:'▦',category:'주방·가전'},
+ {kind:'stove',name:'조리대·가스레인지',width:60,depth:60,icon:'▧',category:'주방·가전'},
+ {kind:'washer',name:'세탁기',width:65,depth:70,icon:'◉',category:'주방·가전'},
+ {kind:'microwave',name:'전자레인지',width:50,depth:40,icon:'▣',category:'주방·가전'},
+ {kind:'custom',name:'직접 입력',width:100,depth:100,icon:'+',category:'기타'}
 ];
 const EPS=1e-7;
 const cross=(a,b)=>a.x*b.y-a.y*b.x;
