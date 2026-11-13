@@ -34,3 +34,11 @@ test('storage enforces 50-entry limit and unique saved plan IDs',()=>{
  assert.equal(decodePlans(JSON.stringify({version:1,plans:[one,one]})).status,'corrupt');
  assert.equal(decodePlans(JSON.stringify({version:1,plans:Array.from({length:51},(_,i)=>({...one,id:String(i)}))})).status,'corrupt');
 });
+
+test('furniture preference flags persist and older saves remain valid',()=>{
+ const legacy={id:'old',name:'이전 배치',savedAt:1,snapshot:template};
+ const updated={...legacy,id:'new',snapshot:{...template,furniture:[{...furniture,fixed:true,replaceable:true}]}};
+ assert.deepEqual(decodePlans(encodePlans([legacy,updated])),{status:'ok',plans:[legacy,updated]});
+ assert.equal(validSnapshot({...template,furniture:[{...furniture,fixed:'yes'}]}),false);
+ assert.equal(validSnapshot({...template,furniture:[{...furniture,replaceable:1}]}),false);
+});

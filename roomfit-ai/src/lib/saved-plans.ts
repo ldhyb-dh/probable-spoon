@@ -31,7 +31,7 @@ export function validSnapshot(value:unknown):value is PlanSnapshot{
  }else{if(!verticesValid(value.vertices)||!Array.isArray(value.vertices))return false;wallCount=value.vertices.length;}
  const openings=value.openings as unknown[], furniture=value.furniture as unknown[];
  if(!openings.every(o=>object(o)&&text(o.id,200)&&['door','window'].includes(String(o.type))&&finite(o.wall)&&Number.isInteger(o.wall)&&o.wall>=-1&&o.wall<wallCount&&finite(o.offset)&&o.offset>=0&&o.offset<=100000&&finite(o.width)&&o.width>=10&&o.width<=100000&&['start','end'].includes(String(o.hinge))&&['inside','outside'].includes(String(o.swing))))return false;
- if(!furniture.every(f=>object(f)&&text(f.id,200)&&text(f.name,40)&&typeof f.kind==='string'&&kinds.has(f.kind)&&finite(f.width)&&f.width>=10&&f.width<=1000&&finite(f.depth)&&f.depth>=10&&f.depth<=1000&&finite(f.x)&&Math.abs(f.x)<=2000&&finite(f.y)&&Math.abs(f.y)<=2000&&finite(f.rotation)&&Math.abs(f.rotation)<=360))return false;
+ if(!furniture.every(f=>object(f)&&text(f.id,200)&&text(f.name,40)&&typeof f.kind==='string'&&kinds.has(f.kind)&&finite(f.width)&&f.width>=10&&f.width<=1000&&finite(f.depth)&&f.depth>=10&&f.depth<=1000&&finite(f.x)&&Math.abs(f.x)<=2000&&finite(f.y)&&Math.abs(f.y)<=2000&&finite(f.rotation)&&Math.abs(f.rotation)<=360&&(f.fixed===undefined||typeof f.fixed==='boolean')&&(f.replaceable===undefined||typeof f.replaceable==='boolean')))return false;
  return uniqueIds(openings as Record<string,unknown>[])&&uniqueIds(furniture as Record<string,unknown>[]);
 }
 export function decodePlans(raw:string|null):{status:'ok'|'corrupt';plans:SavedPlan[]}{
