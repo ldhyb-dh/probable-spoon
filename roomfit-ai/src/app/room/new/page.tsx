@@ -28,7 +28,7 @@ export default function NewRoom() {
   const orientation=horizontal!==vertical?-1:1;
   const vertices=metrics?.points.map(p=>({...p,bulge:0}))??[];
   const placement=useOpeningPlacement(vertices,openings,setOpenings);
-  const furniture=useFurniture(metrics?.points??[]);
+  const furniture=useFurniture(metrics?.points??[],vertices,openings);
   const project=(p:{x:number;y:number})=>{const scale=room?Math.min(480/room.width,320/room.depth):1;const x=(640-(room?.width??0)*scale)/2+p.x*scale,y=(480-(room?.depth??0)*scale)/2+p.y*scale;return {x:horizontal?640-x:x,y:vertical?480-y:y};};
   const inverse=(p:{x:number;y:number})=>{const scale=room?Math.min(480/room.width,320/room.depth):1;return {x:((horizontal?640-p.x:p.x)-(640-(room?.width??0)*scale)/2)/scale,y:((vertical?480-p.y:p.y)-(480-(room?.depth??0)*scale)/2)/scale};};
   const changed=room && fields.some(f=>Number(values[f.key])!==room[f.key]);

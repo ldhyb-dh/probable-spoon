@@ -59,3 +59,13 @@ test('ninety-degree rotation swaps the furniture footprint dimensions',()=>{
  assert.equal(Math.abs(Math.max(...x)-Math.min(...x)-200)<1e-7,true);
  assert.equal(Math.abs(Math.max(...y)-Math.min(...y)-100)<1e-7,true);
 });
+
+
+test('door swing sector checks overlap including rotated furniture',async()=>{
+ const {furnitureHitsSector}=await import('../src/lib/furniture.mjs');
+ const sector={hinge:{x:0,y:0},arc:[{x:100,y:0},{x:70.71,y:70.71},{x:0,y:100}]};
+ const item={id:'1',name:'의자',width:20,depth:20,x:35,y:35,rotation:45};
+ assert.equal(furnitureHitsSector(item,sector),true);
+ assert.equal(furnitureHitsSector({...item,x:110,y:110},sector),false);
+ assert.equal(furnitureHitsSector({...item,x:-20,y:-20},sector),false);
+});

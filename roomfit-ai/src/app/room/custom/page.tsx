@@ -24,7 +24,7 @@ export default function CustomRoom(){
   const result=analyzeFreeRoom(numeric);
   const safe=numeric.every(p=>[p.x,p.y,p.bulge].every(Number.isFinite)&&Math.abs(p.x)<=2000&&Math.abs(p.y)<=2000&&Math.abs(p.bulge)<=500)&&numeric.every((p,i)=>Math.hypot(p.x-numeric[(i+1)%numeric.length].x,p.y-numeric[(i+1)%numeric.length].y)>=1);
   const placement=useOpeningPlacement(safe&&!result.error?numeric:[],openings,setOpenings);
-  const furniture=useFurniture(safe&&!result.error?result.outline:[]);
+  const furniture=useFurniture(safe&&!result.error?result.outline:[],safe&&!result.error?numeric:[],openings);
   const samples=safe?numeric.flatMap((a,i)=>Array.from({length:33},(_,j)=>pointOnWall(a,numeric[(i+1)%numeric.length],j/32))):[];
   const minX=Math.min(...samples.map(p=>p.x)),maxX=Math.max(...samples.map(p=>p.x)),minY=Math.min(...samples.map(p=>p.y)),maxY=Math.max(...samples.map(p=>p.y));
   const scale=safe?Math.min(480/Math.max(maxX-minX,1),320/Math.max(maxY-minY,1)):1;

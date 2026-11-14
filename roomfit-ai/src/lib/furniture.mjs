@@ -81,3 +81,10 @@ export function reflectFurniture(items,axis,outline){
  const key=axis==='horizontal'?'x':'y',center=Math.min(...outline.map(p=>p[key]))+Math.max(...outline.map(p=>p[key]));
  return items.map(item=>({...item,[key]:center-item[key],rotation:((axis==='horizontal'?180-item.rotation:-item.rotation)%360+360)%360}));
 }
+
+// Door swing sectors are approximated by the same arc segments used to draw them.
+export function furnitureHitsSector(item,sector){
+ const rect=furnitureCorners(item);
+ const overlap=(a,b)=>{for(const poly of [a,b])for(let i=0;i<poly.length;i++){const p=poly[i],q=poly[(i+1)%poly.length],axis={x:-(q.y-p.y),y:q.x-p.x};const project=poly=>poly.map(v=>v.x*axis.x+v.y*axis.y);const x=project(a),y=project(b);if(Math.max(...x)<=Math.min(...y)+EPS||Math.max(...y)<=Math.min(...x)+EPS)return false;}return true;};
+ return sector.arc.slice(1).some((p,i)=>overlap(rect,[sector.hinge,sector.arc[i],p]));
+}

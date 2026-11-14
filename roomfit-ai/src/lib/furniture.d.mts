@@ -7,3 +7,5 @@ export function fitsRoom(item:FurnitureItem,outline:FurniturePoint[]):boolean;
 export function furnitureOverlap(a:FurnitureItem,b:FurnitureItem):boolean;
 export function furnitureIssues(item:FurnitureItem,items:FurnitureItem[],outline:FurniturePoint[]):string[];
 export function reflectFurniture(items:FurnitureItem[],axis:'horizontal'|'vertical',outline:FurniturePoint[]):FurnitureItem[];
+
+export function furnitureHitsSector(item:FurnitureItem,sector:{hinge:FurniturePoint;arc:FurniturePoint[]}):boolean;
