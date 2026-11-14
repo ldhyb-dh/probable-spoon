@@ -1,9 +1,11 @@
 import type {FurnitureKind} from '@/lib/furniture-types';
 
 // Each drawing is a small furniture silhouette; labels remain available beside it.
-export function FurnitureIcon({kind, fallback}:{kind:FurnitureKind;fallback:string}) {
- if (kind==='bed'||kind==='chair'||kind==='sofa') return <span aria-hidden="true" className="furniture-emoji">{fallback}</span>;
+export function FurnitureIcon({kind}:{kind:FurnitureKind}) {
  const shapes:Partial<Record<FurnitureKind,React.ReactNode>>={
+  bed:<><path d="M4 14V7M4 21v5M28 21v5M4 20h24v-6H4zM4 17h24M7 14V9h7v5M14 11h10a4 4 0 0 1 4 4"/></>,
+  chair:<><rect x="9" y="4" width="14" height="12" rx="2"/><path d="M7 20h18v4H7zM9 24v4M23 24v4M10 16v4M22 16v4"/></>,
+  sofa:<><path d="M6 15V9a3 3 0 0 1 3-3h14a3 3 0 0 1 3 3v6M6 13a3 3 0 0 0-3 3v7h26v-7a3 3 0 0 0-6 0v2H9v-2a3 3 0 0 0-3-3ZM7 23v3M25 23v3M16 6v12"/></>,
   desk:<><path d="M4 12h24v4H4zM7 16v11M25 16v11M19 16v5h6"/><path d="M21 18h2"/></>,
   wardrobe:<><rect x="7" y="3" width="18" height="25" rx="1"/><path d="M16 3v25M13 14v3M19 14v3M9 28v2M23 28v2"/></>,
   bookshelf:<><rect x="6" y="3" width="20" height="25" rx="1"/><path d="M6 11h20M6 19h20M10 5v5M13 6v4M20 13v5M23 14v4M10 21v5M14 22v4"/></>,
