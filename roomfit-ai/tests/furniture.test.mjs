@@ -69,3 +69,12 @@ test('door swing sector checks overlap including rotated furniture',async()=>{
  assert.equal(furnitureHitsSector({...item,x:110,y:110},sector),false);
  assert.equal(furnitureHitsSector({...item,x:-20,y:-20},sector),false);
 });
+
+
+test('minimum furniture gap accounts for rotation and overlapping footprints',async()=>{
+ const {furnitureGap}=await import('../src/lib/furniture.mjs');
+ const a={id:'a',name:'a',width:20,depth:20,x:0,y:0,rotation:0};
+ assert.equal(furnitureGap(a,{...a,id:'b',x:30}),10);
+ assert.equal(furnitureGap(a,{...a,id:'b',x:10}),0);
+ assert.ok(Math.abs(furnitureGap(a,{...a,id:'b',x:40,rotation:45})-(30-Math.sqrt(200)))<1e-8);
+});

@@ -42,6 +42,14 @@ export default function NewRoom() {
     const v={width:"400",depth:"500",cutWidth:shape==="u"?"160":"180",cutDepth:"200",leftWing:"100"};
     setOpenings([]);setValues(v);setErrors({});setRoom(parseRoom(shape,v).room);setNotice("예시 방을 불러왔어요.");
   }
+  function sampleStudio(){
+    if((room||furniture.items.length||openings.length)&&!window.confirm('현재 편집 중인 내용을 예시 원룸으로 바꿀까요? 저장하지 않은 내용은 사라집니다.'))return;
+    const v={width:'400',depth:'500',cutWidth:'180',cutDepth:'200',leftWing:'100'};
+    setShape('rectangle');setValues(v);setErrors({});setHorizontal(false);setVertical(false);setRoom(parseRoom('rectangle',v).room);placement.cancel();
+    setOpenings([{id:crypto.randomUUID(),type:'door',wall:0,offset:100,width:80,hinge:'start',swing:'inside'},{id:crypto.randomUUID(),type:'window',wall:2,offset:120,width:120,hinge:'start',swing:'inside'}]);
+    furniture.restore([{id:crypto.randomUUID(),kind:'bed',name:'침대',width:100,depth:200,x:70,y:320,rotation:0},{id:crypto.randomUUID(),kind:'desk',name:'책상',width:120,depth:60,x:310,y:75,rotation:0},{id:crypto.randomUUID(),kind:'wardrobe',name:'옷장',width:120,depth:60,x:320,y:360,rotation:90},{id:crypto.randomUUID(),kind:'chair',name:'의자',width:50,depth:50,x:310,y:150,rotation:0}]);
+    setNotice('가구와 문·창문이 포함된 예시 원룸을 불러왔어요. 저장하려면 아래에서 배치를 저장해 주세요.');
+  }
   function select(next:RoomShape){furniture.reset();placement.cancel();setOpenings([]);setHorizontal(false);setVertical(false);setShape(next);setRoom(null);setErrors({});setNotice("");}
   return <>
     <a className="skip-link" href="#room-main">본문 바로가기</a>
@@ -61,7 +69,7 @@ export default function NewRoom() {
             {fields.map(f=><div key={f.key}><label className="field-label" htmlFor={`room-${f.key}`}>{f.label}</label><div className="dimension-input"><input id={`room-${f.key}`} type="number" inputMode="numeric" required min={f.min} max="2000" step="1" value={values[f.key]??""} onChange={e=>setValues({...values,[f.key]:e.target.value})} aria-invalid={!!errors[f.key]} aria-describedby={`hint-${f.key}${errors[f.key]?` error-${f.key}`:""}`} placeholder={f.key==="width"?"예: 400":f.key==="depth"?"예: 500":"예: 100"}/><span>cm</span></div><p className="field-hint" id={`hint-${f.key}`}>{f.hint}</p>{errors[f.key]&&<p className="field-error" id={`error-${f.key}`}>{errors[f.key]}</p>}</div>)}
             <p className="input-policy">전체 길이는 100~2,000cm, 추가 구간은 10~2,000cm의 정수로 입력해 주세요.</p>
             <button className="button create-plan" type="submit">{room?"평면도 업데이트":"평면도 만들기"}<span aria-hidden="true">→</span></button>
-            <button className="sample-button" type="button" onClick={sample}>선택한 모양의 예시 방 불러오기</button>
+            <button className="sample-button" type="button" onClick={sample}>선택한 모양의 예시 방 불러오기</button><button className="sample-button" type="button" onClick={sampleStudio}>가구가 놓인 예시 원룸 불러오기</button>
           </form><p className="field-hint" role="status">{notice}</p>
         </section>
         <section className="plan-card" aria-labelledby="plan-title">

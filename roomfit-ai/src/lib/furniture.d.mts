@@ -9,3 +9,4 @@ export function furnitureIssues(item:FurnitureItem,items:FurnitureItem[],outline
 export function reflectFurniture(items:FurnitureItem[],axis:'horizontal'|'vertical',outline:FurniturePoint[]):FurnitureItem[];
 
 export function furnitureHitsSector(item:FurnitureItem,sector:{hinge:FurniturePoint;arc:FurniturePoint[]}):boolean;
+export function furnitureGap(a:FurnitureItem,b:FurnitureItem):number;

@@ -88,3 +88,11 @@ export function furnitureHitsSector(item,sector){
  const overlap=(a,b)=>{for(const poly of [a,b])for(let i=0;i<poly.length;i++){const p=poly[i],q=poly[(i+1)%poly.length],axis={x:-(q.y-p.y),y:q.x-p.x};const project=poly=>poly.map(v=>v.x*axis.x+v.y*axis.y);const x=project(a),y=project(b);if(Math.max(...x)<=Math.min(...y)+EPS||Math.max(...y)<=Math.min(...x)+EPS)return false;}return true;};
  return sector.arc.slice(1).some((p,i)=>overlap(rect,[sector.hinge,sector.arc[i],p]));
 }
+
+// Minimum outline distance in centimetres for rotated rectangular footprints.
+export function furnitureGap(a,b){
+ if(furnitureOverlap(a,b))return 0;
+ const pointSegment=(p,a,b)=>{const dx=b.x-a.x,dy=b.y-a.y,t=Math.max(0,Math.min(1,((p.x-a.x)*dx+(p.y-a.y)*dy)/(dx*dx+dy*dy)));return Math.hypot(p.x-(a.x+t*dx),p.y-(a.y+t*dy));};
+ const x=furnitureCorners(a),y=furnitureCorners(b);let best=Infinity;
+ for(let i=0;i<4;i++)for(let j=0;j<4;j++){best=Math.min(best,pointSegment(x[i],y[j],y[(j+1)%4]),pointSegment(y[j],x[i],x[(i+1)%4]));}return best;
+}

@@ -190,3 +190,8 @@ button { font-family: inherit; cursor: pointer; }
 .furniture-preferences label { display: inline-flex; align-items: center; gap: .4rem; }
 .furniture-preferences input { width: auto; }
 .furniture-preferences p { flex-basis: 100%; margin: 0; }
+
+.furniture-search { display:flex; flex-wrap:wrap; align-items:end; gap:12px; margin:12px 0; }
+.furniture-search label { display:flex; flex-direction:column; gap:5px; color:var(--muted); font-size:12px; }
+.furniture-search input[type=search], .furniture-search select { border:1px solid #bbc2b2; border-radius:6px; padding:8px; background:#fff; color:var(--foreground); font:inherit; }
+.furniture-search .snap-toggle { flex-direction:row; align-items:center; padding:8px 0; }
